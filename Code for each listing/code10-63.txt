@@ -1,0 +1,1 @@
+@FetchRequest(sortDescriptors: [], predicate: NSPredicate(format: "author.name = 'Stephen King'")) var listOfBooks: FetchedResults<Books>

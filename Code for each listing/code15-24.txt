@@ -1,0 +1,41 @@
+import SwiftUI
+import CoreData
+
+struct ShowCitiesView: View {
+   @FetchRequest(sortDescriptors: [], predicate: NSPredicate(format: "FALSEPREDICATE")) var listCities: FetchedResults<Cities>
+   @State private var openSheet: Bool = false
+   let selectedCountry: Countries?
+
+   init(selectedCountry: Countries?) {
+      self.selectedCountry = selectedCountry
+      if selectedCountry != nil {
+         _listCities = FetchRequest(sortDescriptors: [SortDescriptor(\Cities.name, order: .forward)], predicate: NSPredicate(format: "country = %@", selectedCountry!), animation: .default)
+      }
+   }
+   var body: some View {
+      List {
+         ForEach(listCities) { city in
+            Text(city.name ?? "Undefined")
+         }
+      }
+      .navigationBarTitle(selectedCountry?.name ?? "Undefined")
+      .toolbar {
+         ToolbarItem(placement: .navigationBarTrailing) {
+            Button("Add City") {
+               openSheet = true
+            }
+         }
+      }
+      .sheet(isPresented: $openSheet) {
+         InsertCityView(country: selectedCountry)
+      }
+   }
+}
+struct ShowCitiesView_Previews: PreviewProvider {
+   static var previews: some View {
+      NavigationStack {
+         ShowCitiesView(selectedCountry: nil)
+            .environment(\.managedObjectContext, ApplicationData.preview.container.viewContext)
+      }
+   }
+}

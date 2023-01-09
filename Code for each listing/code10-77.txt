@@ -1,0 +1,23 @@
+func storeBook(title: String, year: Int32) async {
+  await dbContext.perform {
+      let newBook = Books(context: dbContext)
+      newBook.title = title
+      newBook.year = year
+      newBook.author = selectedAuthor
+      newBook.cover = UIImage(named: "bookcover")?.pngData()
+      newBook.thumbnail = UIImage(named: "bookthumbnail")?.pngData()
+
+      var letter = String(title.first!).uppercased()
+      if Int(letter) != nil {
+         letter = "#"
+      }
+      newBook.firstLetter = letter
+
+      do {
+         try dbContext.save()
+         dismiss()
+      } catch {
+         print("Error saving record")
+      }
+   }
+}

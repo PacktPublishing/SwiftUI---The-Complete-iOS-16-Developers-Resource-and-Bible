@@ -1,0 +1,38 @@
+
+import SwiftUI
+
+struct SettingsView: View {
+   @EnvironmentObject var appData: ApplicationData
+
+   var body: some View {
+      Form {
+         Section {
+            HStack(alignment: .top) {
+               Text("Corner Radius")
+                  .padding(.top, 6)
+               VStack {
+                  Slider(value: $appData.cornerSize, in: 0...30)
+                  Image("nocover")
+                     .resizable()
+                     .scaledToFit()
+                     .cornerRadius(appData.cornerSize)
+                     .frame(width: 80, height: 100)
+               }
+            }
+         }
+         Section {
+            List {
+               Toggle("Show Picture", isOn: $appData.showCover)
+               Toggle("Show Year", isOn: $appData.showYear)
+            }
+         }
+      }
+      .navigationBarTitle("Settings")
+   }
+}
+struct SettingsView_Previews: PreviewProvider {
+   static var previews: some View {
+      SettingsView()
+   }
+}
+

@@ -1,0 +1,35 @@
+
+import SwiftUI
+
+struct BooksView: View {
+   @EnvironmentObject var appData: ApplicationData
+   @Binding var selectedBook: BookViewModel?
+
+   var body: some View {
+      List(appData.userData, selection: $selectedBook) { book in
+         NavigationLink(value: book, label: {
+            Text(book.title)
+         })
+      }
+      .listStyle(.sidebar)
+      .navigationTitle("Books")
+      .toolbar {
+         ToolbarItem(placement: .navigationBarTrailing) {
+            NavigationLink(value: "Settings View", label: {
+               Image(systemName: "gear")
+            })
+            .isDetailLink(false)
+         }
+      }
+      .navigationDestination(for: String.self, destination: { _ in
+         SettingsView()
+      })
+   }
+}
+struct BooksView_Previews: PreviewProvider {
+   static var previews: some View {
+      BooksView(selectedBook: .constant(nil))
+         .environmentObject(ApplicationData())
+   }
+}
+

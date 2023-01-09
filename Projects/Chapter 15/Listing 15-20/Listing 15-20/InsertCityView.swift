@@ -1,0 +1,45 @@
+
+import SwiftUI
+import CoreData
+
+struct InsertCityView: View {
+   @Environment(\.managedObjectContext) var dbContext
+   @Environment(\.dismiss) var dismiss
+   @State private var inputName: String = ""
+   let country: Countries?
+
+   var body: some View {
+      VStack {
+         HStack {
+            Text("City:")
+            TextField("Insert City", text: $inputName)
+               .textFieldStyle(.roundedBorder)
+         }
+         HStack {
+            Spacer()
+            Button("Save") {
+               let text = inputName.trimmingCharacters(in: .whitespaces)
+               if !text.isEmpty {
+                  let newCity = Cities(context: dbContext)
+                  newCity.name = text
+                  newCity.country = country
+                  do {
+                     try dbContext.save()
+                  } catch {
+                     print("Error saving city")
+                  }
+                  dismiss()
+               }
+            }
+         }
+         Spacer()
+      }.padding()
+   }
+}
+struct InsertCityView_Previews: PreviewProvider {
+   static var previews: some View {
+      InsertCityView(country: nil)
+         .environment(\.managedObjectContext, ApplicationData.preview.container.viewContext)
+   }
+}
+

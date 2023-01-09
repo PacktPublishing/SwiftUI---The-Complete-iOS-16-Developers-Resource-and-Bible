@@ -1,0 +1,4 @@
+init(appData: ApplicationData) {
+   self.appData = appData
+   contentData.titleInput = self.appData.title
+}

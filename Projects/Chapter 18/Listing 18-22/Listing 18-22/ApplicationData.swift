@@ -1,0 +1,59 @@
+
+import SwiftUI
+import AVFoundation
+
+class ViewData: NSObject {
+   var playerItem: AVPlayerItem!
+   var player: AVPlayer!
+   var playerLayer: AVPlayerLayer!
+
+   func setObserver() {
+      playerItem.addObserver(self, forKeyPath: "status", options: [], context: nil)
+   }
+   override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+      if playerItem.status == .readyToPlay {
+         playerItem.removeObserver(self, forKeyPath: "status")
+         player.play()
+      }
+   }
+}
+class ApplicationData: ObservableObject {
+   var customVideoView: CustomPlayerView!
+   var viewData: ViewData
+
+   init() {
+      customVideoView = CustomPlayerView()
+      viewData = ViewData()
+
+      let bundle = Bundle.main
+      let videoURL = bundle.url(forResource: "videotrees", withExtension: "mp4")
+
+      let asset = AVURLAsset(url: videoURL!)
+      viewData.playerItem = AVPlayerItem(asset: asset)
+      viewData.player = AVPlayer(playerItem: viewData.playerItem)
+      viewData.playerLayer = AVPlayerLayer(player: viewData.player)
+
+      let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+      let screenSize = scene?.screen.bounds ?? .zero
+      viewData.playerLayer.frame = screenSize
+      let layer = customVideoView.view.layer
+      layer.addSublayer(viewData.playerLayer)
+      viewData.setObserver()
+      
+      Task(priority: .background) {
+         await receiveNotification()
+      }
+   }
+   func receiveNotification() async {
+      let center = NotificationCenter.default
+      let name = await UIDevice.orientationDidChangeNotification
+      for await _ in center.notifications(named: name, object: nil) {
+         if viewData.playerItem != nil {
+            await MainActor.run {
+               viewData.playerLayer.frame = customVideoView.view.bounds
+            }
+         }
+      }
+   }
+}
+

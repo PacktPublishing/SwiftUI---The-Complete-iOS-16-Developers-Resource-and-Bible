@@ -1,0 +1,24 @@
+import UIKit
+import CloudKit
+
+class CustomAppDelegate: NSObject, UIApplicationDelegate {
+   let appData = ApplicationData.shared
+
+   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+      application.registerForRemoteNotifications()
+      Task(priority: .background) {
+         await appData.configureDatabase()
+      }
+      return true
+   }
+   func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+      let notification = CKNotification(fromRemoteNotificationDictionary: userInfo) as? CKDatabaseNotification
+      guard notification != nil else {
+         completionHandler(.failed)
+         return
+      }
+      appData.checkUpdates(finishClosure: { (result) in
+         completionHandler(result)
+      })
+   }
+}

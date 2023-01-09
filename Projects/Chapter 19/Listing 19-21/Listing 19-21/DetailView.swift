@@ -1,0 +1,38 @@
+
+import SwiftUI
+
+struct DetailView: View {
+   @EnvironmentObject var appData: ApplicationData
+   let items: ConsumableItems
+
+   var body: some View {
+      List {
+         ForEach(items.items, id: \.self) { item in
+            Text(item)
+         }
+      }
+      #if os(macOS)
+      .listStyle(.inset(alternatesRowBackgrounds: true))
+      #endif
+      .toolbar {
+         ToolbarItem(placement: .automatic) {
+            Button(action: {
+                  print("Adding Item")
+               }, label: {
+                  Label("Add Item", systemImage: "plus")
+               })
+         }
+      }
+      .navigationTitle("My Title")
+      #if os(macOS)
+      .navigationSubtitle("My Subtitle")
+      #endif
+   }
+}
+struct DetailView_Previews: PreviewProvider {
+   static var previews: some View {
+      DetailView(items: ConsumableItems(name: "", items: []))
+         .environmentObject(ApplicationData())
+   }
+}
+

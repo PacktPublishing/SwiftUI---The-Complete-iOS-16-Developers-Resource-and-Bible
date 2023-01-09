@@ -1,0 +1,21 @@
+class ApplicationData: ObservableObject {
+   @AppStorage("subscriptionSaved") var subscriptionSaved: Bool = false
+   @AppStorage("zoneCreated") var zoneCreated: Bool = false
+   @AppStorage("databaseToken") var databaseToken: Data = Data()
+   @AppStorage("zoneToken") var zoneToken: Data = Data()
+
+   @Published var listCountries: [CountryViewModel] = []
+   @Published var listCities: [CityViewModel] = []
+   var database: CKDatabase!
+
+   static let shared = ApplicationData()
+
+   private init() {
+      let container = CKContainer.default()
+      database = container.privateCloudDatabase
+      
+      Task(priority: .high) {
+         await readCountries()
+      }
+   }
+}

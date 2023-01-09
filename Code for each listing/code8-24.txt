@@ -1,0 +1,17 @@
+struct ContentView: View {
+   @EnvironmentObject var appData: ApplicationData
+   @State private var path = NavigationPath()
+
+   var body: some View {
+      NavigationStack(path: $path) {
+         List(appData.userData) { book in
+            NavigationLink(value: book, label: {
+               CellBook(book: book)
+            })
+         }.navigationTitle(Text("Books"))
+         .navigationDestination(for: BookViewModel.self, destination: { book in
+            DetailView(path: $path, book: book)
+         })
+      }
+   }
+}

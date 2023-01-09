@@ -1,0 +1,29 @@
+import SwiftUI
+
+class ContentData: ObservableObject {
+   @Published var inputURL: String = ""
+}
+struct ContentView: View {
+   @ObservedObject var contentData = ContentData()
+   var webView: WebView!
+
+   init() {
+      webView = WebView(inputURL: $contentData.inputURL)
+   }
+   var body: some View {
+      VStack {
+         HStack {
+            TextField("Insert URL", text: $contentData.inputURL)
+               .autocapitalization(.none)
+               .disableAutocorrection(true)
+            Button("Load") {
+               let text = contentData.inputURL.trimmingCharacters(in: .whitespaces)
+               if !text.isEmpty {
+                  webView.loadWeb(web: text)
+               }
+            }
+         }.padding(5)
+         webView
+      }
+   }
+}

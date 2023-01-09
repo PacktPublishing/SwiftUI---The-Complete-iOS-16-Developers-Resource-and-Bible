@@ -1,0 +1,22 @@
+func getDetails(file: UUID) -> (String, String, String, String) {
+   var values = ("", "", "", "")
+   if let file = listOfFiles[currentDirectory]?.first(where: { $0.id == file }) {
+      let fileURL = docURL.appendingPathComponent("\(directories[currentDirectory])/\(file.name)")
+      let filePath = fileURL.path
+
+      if manager.fileExists(atPath: filePath) {
+         if let attributes = try? manager.attributesOfItem(atPath: filePath) {
+            let type = attributes[.type] as! FileAttributeType
+            let size = attributes[.size] as! Int
+            let date = attributes[.creationDate] as! Date
+            if type != FileAttributeType.typeDirectory {
+               values.0 = file.name
+               values.1 = fileURL.pathExtension
+               values.2 = String(size)
+               values.3 = date.formatted(date: .abbreviated, time: .omitted)
+            }
+         }
+      }
+   }
+   return values
+}

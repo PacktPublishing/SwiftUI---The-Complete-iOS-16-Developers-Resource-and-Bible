@@ -1,0 +1,22 @@
+struct ContentView: View {
+   @EnvironmentObject var appData: ApplicationData
+
+   var body: some View {
+      VStack {
+         HStack {
+            Stepper("", value: $appData.control)
+               .labelsHidden()
+            Text("\(appData.control.formatted(.number.precision(.fractionLength(0))))")
+               .font(.title)
+            Spacer()
+         }
+         Spacer()
+      }.padding()
+      .onChange(of: appData.control) { value in
+         appData.valueChanged(value: value)
+      }
+      .task {
+         await appData.valueReceived()
+      }
+   }
+}

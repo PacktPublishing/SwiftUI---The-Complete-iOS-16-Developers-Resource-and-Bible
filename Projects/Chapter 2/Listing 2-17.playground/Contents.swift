@@ -1,0 +1,2 @@
+
+var myletter: Character = "A"

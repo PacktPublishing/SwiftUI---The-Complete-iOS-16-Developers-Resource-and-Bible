@@ -1,0 +1,18 @@
+func showCamera() {
+   let width = cameraView.view.bounds.size.width
+   let height = cameraView.view.bounds.size.height
+
+   viewData.previewLayer = AVCaptureVideoPreviewLayer(session: viewData.captureSession)
+   viewData.previewLayer.videoGravity = .resizeAspectFill
+   viewData.previewLayer.frame = CGRect(x: 0, y: 0, width: width, height: height)
+
+   let videoOrientation = getCurrentOrientation()
+   let connection = viewData.previewLayer.connection
+   connection?.videoOrientation = videoOrientation
+
+   let layer = cameraView.view.layer
+   layer.addSublayer(viewData.previewLayer)
+   Task(priority: .background) {
+      viewData.captureSession.startRunning()
+   }
+}

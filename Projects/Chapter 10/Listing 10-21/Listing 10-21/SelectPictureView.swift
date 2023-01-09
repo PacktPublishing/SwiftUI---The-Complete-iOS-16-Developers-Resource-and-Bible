@@ -1,0 +1,38 @@
+
+import SwiftUI
+
+struct SelectPictureView: View {
+   @EnvironmentObject var appData: ApplicationData
+   @Environment(\.dismiss) var dismiss
+
+   var body: some View {
+      VStack {
+         ScrollView(.horizontal, showsIndicators: true) {
+            HStack(spacing: 15) {
+               ForEach(appData.listPictures, id: \.self) { name in
+                  ZStack(alignment: .bottom) {
+                     Image(name)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 160)
+                     Button(action: {
+                        appData.saveFile(namePicture: name)
+                        dismiss()
+                     }, label: {
+                        Text("Select Picture")
+                           .foregroundColor(Color.white)
+                     }).buttonStyle(.borderedProminent)
+                     .offset(x: 0, y: -15)
+                  }
+               }
+            }
+         }.padding(.top, 25)
+         Spacer()
+      }.padding()
+   }
+}
+struct SelectPictureView_Previews: PreviewProvider {
+    static var previews: some View {
+       SelectPictureView().environmentObject(ApplicationData())
+    }
+}

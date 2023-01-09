@@ -1,0 +1,7 @@
+List {
+   ForEach(listOfBooks) { book in
+      NavigationLink(destination: AuthorBooksView(selectedAuthor: book.author), label: {
+         RowBook(book: book)
+      })
+   }
+}

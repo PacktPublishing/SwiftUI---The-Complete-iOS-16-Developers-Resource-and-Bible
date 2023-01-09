@@ -1,0 +1,34 @@
+func insertCountry(name: String) async {
+   await configureDatabase()
+
+   do {
+      let container = CKContainer.default()
+      let status = try await container.accountStatus()
+      if status != CKAccountStatus.available {
+         print("iCloud Not Available")
+         return
+      }
+   } catch {
+      print("Error: \(error)")
+      return
+   }
+   let text = name.trimmingCharacters(in: .whitespaces)
+   if !text.isEmpty {
+      let zone = CKRecordZone(zoneName: "listPlaces")
+      let id = CKRecord.ID(recordName: "idcountry-\(UUID())", zoneID: zone.zoneID)
+      let record = CKRecord(recordType: "Countries", recordID: id)
+      record.setObject(text as NSString, forKey: "name")
+
+      do {
+         try await database.save(record)
+         await MainActor.run {
+            let newCountry = Country(name: record["name"], record: record)
+            let newItem = CountryViewModel(id: record.recordID, country: newCountry)
+            listCountries.append(newItem)
+            listCountries.sort(by: { $0.countryName < $1.countryName })
+         }
+      } catch {
+         print("Error: \(error)")
+      }
+   }
+}

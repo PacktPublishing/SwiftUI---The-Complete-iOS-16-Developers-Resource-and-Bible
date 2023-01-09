@@ -1,0 +1,5 @@
+import Foundation
+
+let mydate = Date.now
+let text = mydate.formatted(date: .abbreviated, time: .omitted)
+print(text)  // "Jun 18, 2021"

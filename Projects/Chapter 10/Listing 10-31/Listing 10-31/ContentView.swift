@@ -1,0 +1,49 @@
+
+import SwiftUI
+
+struct ContentView: View {
+   @EnvironmentObject var appData: ApplicationData
+   @State private var openSheet: Bool = false
+
+   var body: some View {
+      NavigationStack {
+         VStack {
+            List {
+               ForEach(appData.listOfFiles) { file in
+                  NavigationLink(destination: {
+                     EditFileView(file: file)
+                  } , label: {
+                     HStack {
+                        Text(file.name)
+                        Spacer()
+                        Button(action: {
+                           appData.exportDocument(file: file)
+                        }, label: {
+                           Image(systemName: "square.and.arrow.up")
+                        }).buttonStyle(.plain)
+                     }
+                  })
+               }
+            }.listStyle(.plain)
+         }.padding()
+         .navigationBarTitle("Files")
+         .navigationBarTitleDisplayMode(.inline)
+         .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+               Button("Add File") {
+                  openSheet = true
+               }
+            }
+         }
+         .sheet(isPresented: $openSheet) {
+            AddFileView()
+         }
+      }
+   }
+}
+struct ContentView_Previews: PreviewProvider {
+   static var previews: some View {
+      ContentView().environmentObject(ApplicationData())
+   }
+}
+

@@ -1,0 +1,62 @@
+import SwiftUI
+
+struct DetailView: View {
+   @Environment(\.horizontalSizeClass) var horizontal
+   let book: BookViewModel
+
+   var body: some View {
+      Group {
+         if horizontal == .regular {
+            DetailLarge(book: book)
+         } else {
+            DetailSmall(book: book)
+         }
+      }.padding()
+      .navigationTitle(Text("Information"))
+   }
+}
+struct DetailLarge: View {
+   let book: BookViewModel
+
+   var body: some View {
+      HStack {
+         VStack {
+            Image(book.cover)
+               .resizable()
+               .scaledToFit()
+               .frame(maxWidth: 300)
+            Spacer()
+         }
+         VStack(alignment: .leading, spacing: 4) {
+            Text(book.title)
+               .font(.title)
+            Text(book.author)
+            Text(book.year)
+            Spacer()
+         }.frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+         Spacer()
+      }
+   }
+}
+struct DetailSmall: View {
+   let book: BookViewModel
+
+   var body: some View {
+      VStack {
+         Text(book.title)
+            .font(.title)
+         Text(book.author)
+         Text(book.year)
+            .font(.caption)
+         Image(book.cover)
+            .resizable()
+            .scaledToFit()
+            .frame(maxWidth: 300)
+      }.multilineTextAlignment(.center)
+   }
+}
+struct DetailView_Previews: PreviewProvider {
+   static var previews: some View {
+      DetailView(book: ApplicationData().userData[1])
+   }
+}

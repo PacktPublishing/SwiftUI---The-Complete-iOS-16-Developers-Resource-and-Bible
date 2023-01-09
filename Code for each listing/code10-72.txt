@@ -1,0 +1,53 @@
+struct ContentView: View {
+   @Environment(\.managedObjectContext) var dbContext
+   @FetchRequest(sortDescriptors: [SortDescriptor(\Books.title, order: .forward)], predicate: nil, animation: .default) var listOfBooks: FetchedResults<Books>
+   @State private var totalBooks: Int = 0
+
+   var body: some View {
+      NavigationStack {
+         List {
+            HStack {
+               Text("Total Books")
+               Spacer()
+               Text("\(totalBooks)")
+                  .bold()
+            }.foregroundColor(Color.green)
+
+            ForEach(listOfBooks) { book in
+               NavigationLink(destination: ModifyBookView(book: book), label: {
+                  RowBook(book: book)
+                     .id(UUID())
+               })
+            }
+            .onDelete(perform: { indexes in
+               for index in indexes {
+                  dbContext.delete(listOfBooks[index])
+                  countBooks()
+               }
+               do {
+                  try dbContext.save()
+               } catch {
+                  print("Error deleting objects")
+               }
+            })
+         }
+         .navigationBarTitle("Books")
+         .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+               NavigationLink(destination: InsertBookView(), label: {
+                  Image(systemName: "plus")
+               })
+            }
+         }
+         .onAppear {
+            countBooks()
+         }
+      }
+   }
+   func countBooks() {
+      let request: NSFetchRequest<Books> = Books.fetchRequest()
+      if let list = try? self.dbContext.fetch(request) {
+         totalBooks = list.count
+      }
+   }
+}

@@ -1,0 +1,9 @@
+
+import UIKit
+
+class CustomSceneDelegate: NSObject, UIWindowSceneDelegate {
+   func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+      print("Scene was created")
+   }
+}
+

@@ -1,0 +1,1 @@
+@FetchRequest(sortDescriptors: [SortDescriptor(\Books.title, comparator: .lexical, order: .forward)], predicate: nil, animation: .default) var listOfBooks: FetchedResults<Books>

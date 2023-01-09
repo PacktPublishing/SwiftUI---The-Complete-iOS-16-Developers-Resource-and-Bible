@@ -1,0 +1,5 @@
+
+func calculateResult<T: Numeric>(value1: T, value2: T) {
+   print(value1 + value2)  // 7.5
+}
+calculateResult(value1: 3.5, value2: 4)

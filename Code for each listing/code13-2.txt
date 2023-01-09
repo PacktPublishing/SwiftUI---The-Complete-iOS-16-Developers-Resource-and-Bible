@@ -1,0 +1,11 @@
+import SwiftUI
+import MapKit
+
+struct ContentView: View {
+   @EnvironmentObject var appData: ApplicationData
+
+   var body: some View {
+      Map(coordinateRegion: $appData.region)
+         .ignoresSafeArea()
+   }
+}

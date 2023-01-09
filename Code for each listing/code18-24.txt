@@ -1,0 +1,8 @@
+struct ContentView: View {
+   @EnvironmentObject var appData: ApplicationData
+   
+   var body: some View {
+      appData.customVideoView
+         .ignoresSafeArea()
+   }
+}

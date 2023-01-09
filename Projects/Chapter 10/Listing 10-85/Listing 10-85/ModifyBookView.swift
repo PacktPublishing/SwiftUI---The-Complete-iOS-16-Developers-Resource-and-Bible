@@ -1,0 +1,99 @@
+
+import SwiftUI
+import CoreData
+
+struct ModifyBookView: View {
+   @Environment(\.managedObjectContext) var dbContext
+   @Environment(\.dismiss) var dismiss
+   @State private var selectedAuthors: [Authors] = []
+   @State private var inputTitle: String = ""
+   @State private var inputYear: String = ""
+   @State private var valuesLoaded: Bool = false
+
+   let book: Books?
+
+   var showAuthors: String {
+      var authors = "Undefined"
+      if !selectedAuthors.isEmpty {
+         let listNames = selectedAuthors.map({ $0.name ?? "Undefined" })
+         if !listNames.isEmpty {
+            authors = listNames.joined(separator: ", ")
+         }
+      }
+      return authors
+   }
+   var body: some View {
+      VStack(spacing: 12) {
+         HStack {
+            Text("Title:")
+            TextField("Insert Title", text: $inputTitle)
+               .textFieldStyle(.roundedBorder)
+         }
+         HStack {
+            Text("Year:")
+            TextField("Insert Year", text: $inputYear)
+               .textFieldStyle(.roundedBorder)
+         }
+         HStack(alignment: .top) {
+            Text("Author:")
+            VStack(alignment: .leading, spacing: 8) {
+               Text(showAuthors)
+                  .foregroundColor(selectedAuthors.count > 0 ? Color.black : Color.gray)
+               NavigationLink(destination: AuthorsView(selected: $selectedAuthors), label: {
+                  Text("Select Authors")
+               })
+            }
+         }.frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+         Spacer()
+      }.padding()
+      .navigationBarTitle("Modify Book")
+      .toolbar {
+         ToolbarItem(placement: .navigationBarTrailing) {
+            Button("Save") {
+               let newTitle = inputTitle.trimmingCharacters(in: .whitespaces)
+               let newYear = Int32(inputYear)
+               if !newTitle.isEmpty && newYear != nil {
+                  Task(priority: .high) {
+                     await saveBook(title: newTitle, year: newYear!)
+                  }
+               }
+            }
+         }
+      }
+      .onAppear {
+         if let list = book?.author as? Set<Authors>, !valuesLoaded {
+            selectedAuthors = Array(list)
+            inputTitle = book?.title ?? ""
+            inputYear = book?.showYear ?? ""
+            valuesLoaded = true
+         }
+      }
+   }
+   func saveBook(title: String, year: Int32) async {
+      await dbContext.perform {
+         book?.title = title
+         book?.year = year
+         book?.author = NSSet(array: selectedAuthors)
+
+         var letter = String(title.first!).uppercased()
+         if Int(letter) != nil {
+            letter = "#"
+         }
+         book?.firstLetter = letter
+
+         do {
+            try dbContext.save()
+            dismiss()
+         } catch {
+            print("Error saving record")
+         }
+      }
+   }
+}
+struct ModifyBookView_Previews: PreviewProvider {
+   static var previews: some View {
+      ModifyBookView(book: nil)
+         .environment(\.managedObjectContext, ApplicationData.preview.container.viewContext)
+   }
+}
+

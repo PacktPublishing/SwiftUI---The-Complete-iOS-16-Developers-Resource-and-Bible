@@ -1,0 +1,112 @@
+func downloadUpdates(finishClosure: @escaping (UIBackgroundFetchResult) -> Void) {
+   var changeToken: CKServerChangeToken!
+   var changeZoneToken: CKServerChangeToken!
+   if let token = try? NSKeyedUnarchiver.unarchivedObject(ofClass: CKServerChangeToken.self, from: databaseToken) {
+      changeToken = token
+   }
+   if let token = try? NSKeyedUnarchiver.unarchivedObject(ofClass: CKServerChangeToken.self, from: zoneToken) {
+      changeZoneToken = token
+   }
+   var zonesIDs: [CKRecordZone.ID] = []
+   let operation = CKFetchDatabaseChangesOperation(previousServerChangeToken: changeToken)
+   operation.recordZoneWithIDChangedBlock = { zoneID in
+      zonesIDs.append(zoneID)
+   }
+   operation.changeTokenUpdatedBlock = { token in
+      changeToken = token
+   }
+   operation.fetchDatabaseChangesResultBlock = { result in
+      guard let values = try? result.get() else {
+         finishClosure(UIBackgroundFetchResult.failed)
+         return
+      }
+      if zonesIDs.isEmpty {
+         finishClosure(UIBackgroundFetchResult.noData)
+      } else {
+         changeToken = values.serverChangeToken
+
+         let configuration = CKFetchRecordZoneChangesOperation.ZoneConfiguration()
+         configuration.previousServerChangeToken = changeZoneToken
+         let fetchOperation = CKFetchRecordZoneChangesOperation(recordZoneIDs: zonesIDs, configurationsByRecordZoneID: [zonesIDs[0]: configuration])
+
+         fetchOperation.recordWasChangedBlock = { recordID, result in
+            guard let record = try? result.get() else {
+               print("Error")
+               return
+            }
+            if record.recordType == "Countries" {
+               Task(priority: .high) {
+                  let index = self.listCountries.firstIndex(where: { item in
+                     return item.id == record.recordID
+                  })
+                  await MainActor.run {
+                     let newCountry = Country(name: record["name"], record: record)
+                     let newItem = CountryViewModel(id: record.recordID, country: newCountry)
+                     if index != nil {
+                        self.listCountries[index!] = newItem
+                     } else {
+                        self.listCountries.append(newItem)
+                     }
+                     self.listCountries.sort(by: { $0.countryName < $1.countryName })
+                  }
+               }
+            }
+         }
+         fetchOperation.recordWithIDWasDeletedBlock = { recordID, recordType in
+            if recordType == "Countries" {
+               Task(priority: .high) {
+                  let index = self.listCountries.firstIndex(where: {(item) in
+                     return item.id == recordID
+                  })
+                  await MainActor.run {
+                     if index != nil {
+                        self.listCountries.remove(at: index!)
+                     }
+                     self.listCountries.sort(by: { $0.countryName < $1.countryName })
+                  }
+               }
+            }
+         }
+         fetchOperation.recordZoneChangeTokensUpdatedBlock = { zoneID, token, data in
+            changeZoneToken = token
+         }
+         fetchOperation.recordZoneFetchResultBlock = { zoneID, result in
+            guard let values = try? result.get() else {
+               print("Error")
+               return
+            }
+            changeZoneToken = values.serverChangeToken
+         }
+         fetchOperation.fetchRecordZoneChangesResultBlock = { result in
+            switch result {
+               case .failure(_):
+                  finishClosure(UIBackgroundFetchResult.failed)
+                  return
+               default:
+                  break
+            }
+            if changeToken != nil {
+               if let data = try? NSKeyedArchiver.archivedData(withRootObject: changeToken!, requiringSecureCoding: false) {
+                  Task(priority: .high) {
+                     await MainActor.run {
+                        self.databaseToken = data
+                     }
+                  }
+               }
+            }
+            if changeZoneToken != nil {
+               if let data = try? NSKeyedArchiver.archivedData(withRootObject: changeZoneToken!, requiringSecureCoding: false) {
+                  Task(priority: .high) {
+                     await MainActor.run {
+                        self.zoneToken = data
+                     }
+                  }
+               }
+            }
+            finishClosure(UIBackgroundFetchResult.newData)
+         }
+         self.database.add(fetchOperation)
+      }
+   }
+   database.add(operation)
+}

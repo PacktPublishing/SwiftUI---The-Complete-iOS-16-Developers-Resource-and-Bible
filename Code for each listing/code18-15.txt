@@ -1,0 +1,9 @@
+func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+   let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+   let scale = scene?.screen.scale ?? 1
+
+   if let imageData = photo.cgImageRepresentation() {
+      picture = UIImage(cgImage: imageData, scale: scale, orientation: viewData.imageOrientation)
+      path = NavigationPath()
+   }
+}

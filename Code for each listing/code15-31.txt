@@ -1,0 +1,25 @@
+func insertCity(name: String, country: CKRecord.ID) async {
+   let id = CKRecord.ID(recordName: "idcity-\(UUID())")
+   let record = CKRecord(recordType: "Cities", recordID: id)
+   record.setObject(name as NSString, forKey: "name")
+
+   let reference = CKRecord.Reference(recordID: country, action: .deleteSelf)
+   record.setObject(reference, forKey: "country")
+
+   let bundle = Bundle.main
+   if let fileURL = bundle.url(forResource: "Toronto", withExtension: "jpg") {
+      let asset = CKAsset(fileURL: fileURL)
+      record.setObject(asset, forKey: "picture")
+   }
+   do {
+      try await database.save(record)
+      await MainActor.run {
+         let newCity = City(name: record["name"], record: record)
+         let newItem = CityViewModel(id: record.recordID, city: newCity)
+         listCities.append(newItem)
+         listCities.sort(by: { $0.cityName < $1.cityName })
+      }
+   } catch {
+      print("Error: \(error)")
+   }
+}

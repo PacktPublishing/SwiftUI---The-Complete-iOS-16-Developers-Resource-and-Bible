@@ -1,0 +1,8 @@
+List {
+   ForEach(listOfBooks) { book in
+      NavigationLink(destination: ModifyBookView(book: book), label: {
+         RowBook(book: book)
+            .id(UUID())
+      })
+   }
+}

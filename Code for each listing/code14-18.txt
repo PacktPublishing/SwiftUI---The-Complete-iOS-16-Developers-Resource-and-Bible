@@ -1,0 +1,13 @@
+Button("Post Notification") {
+   let message = inputMessage.trimmingCharacters(in: .whitespaces)
+   if !message.isEmpty {
+      Task(priority: .background) {
+         let center = UNUserNotificationCenter.current()
+         let authorization = await center.notificationSettings()
+         let status = authorization.authorizationStatus
+         if status == .authorized || status == .provisional {
+            await sendNotification()
+         }
+      }
+   }
+}.disabled(isButtonDisabled)

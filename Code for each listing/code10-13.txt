@@ -1,0 +1,22 @@
+func deleteFile(name: String) {
+   let fileURL = docURL.appendingPathComponent("\(directories[currentDirectory])/\(name)")
+   do {
+      try manager.removeItem(atPath: fileURL.path)
+      listOfFiles[currentDirectory]?.removeAll(where: { $0.name == name} )
+   } catch {
+      print("File was not removed")
+   }
+}
+func moveToArchived(name: String) {
+   let origin = docURL.appendingPathComponent("\(directories[0])/\(name)")
+   let destination = docURL.appendingPathComponent("\(directories[1])/\(name)")
+   if !manager.fileExists(atPath: destination.path) {
+      do {
+         try manager.moveItem(atPath: origin.path, toPath: destination.path)
+         listOfFiles[0]?.removeAll(where: { $0.name == name} )
+         listOfFiles[1]?.append(File(name: name))
+      } catch {
+         print("File was not moved")
+      }
+   }
+}

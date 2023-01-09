@@ -1,0 +1,6 @@
+func checkUpdates(finishClosure: @escaping (UIBackgroundFetchResult) -> Void) {
+   Task(priority: .high) {
+      await configureDatabase()
+      downloadUpdates(finishClosure: finishClosure)
+   }
+}

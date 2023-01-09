@@ -1,0 +1,3 @@
+.onAppear {
+   contentData.titleInput = appData.title
+}

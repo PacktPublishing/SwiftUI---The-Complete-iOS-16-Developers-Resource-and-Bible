@@ -1,0 +1,4 @@
+
+let name = "John"
+var mytext = "My name is "
+mytext += name  // "My name is John"

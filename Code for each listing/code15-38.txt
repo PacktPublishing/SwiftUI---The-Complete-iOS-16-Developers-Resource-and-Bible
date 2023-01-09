@@ -1,0 +1,28 @@
+func configureDatabase() async {
+   if !subscriptionSaved {
+      let newSubscription = CKDatabaseSubscription(subscriptionID: "updatesDatabase")
+      let info = CKSubscription.NotificationInfo()
+      info.shouldSendContentAvailable = true
+      newSubscription.notificationInfo = info
+
+      do {
+         try await database.save(newSubscription)
+         await MainActor.run {
+            subscriptionSaved = true
+         }
+      } catch {
+         print("Error: \(error)")
+      }
+   }
+   if !zoneCreated {
+      let newZone = CKRecordZone(zoneName: "listPlaces")
+      do {
+         try await database.save(newZone)
+         await MainActor.run {
+            zoneCreated = true
+         }
+      } catch {
+         print("Error: \(error)")
+      }
+   }
+}

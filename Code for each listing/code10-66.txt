@@ -1,0 +1,8 @@
+.searchable(text: $search, prompt: Text("Insert Title"))
+.onChange(of: search) { value in
+   if !value.isEmpty {
+      listOfBooks.nsPredicate = NSPredicate(format: "title CONTAINS[dc] %@", value)
+   } else {
+      listOfBooks.nsPredicate = nil
+   }
+}

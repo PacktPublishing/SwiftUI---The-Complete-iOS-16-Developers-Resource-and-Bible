@@ -1,0 +1,45 @@
+struct AuthorsView: View {
+   @FetchRequest(sortDescriptors: [], predicate: nil, animation: .default) private var listOfAuthors: FetchedResults<Authors>
+   @Environment(\.dismiss) var dismiss
+   @Binding var selected: [Authors]
+
+   var body: some View {
+      List {
+         ForEach(listOfAuthors) { author in
+            HStack {
+               Text(author.showName)
+               if selected.contains(where: { $0.name == author.name }) {
+                  Image(systemName: "checkmark")
+                     .foregroundColor(Color.blue)
+                     .frame(width: 25, height: 25)
+               }
+            }
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+            .onTapGesture {
+               if selected.contains(where: { $0.name == author.name }) {
+                  if let index = selected.firstIndex(of: author) {
+                     selected.remove(at: index)
+                  }
+               } else {
+                  selected.append(author)
+               }
+               dismiss()
+            }
+         }
+      }
+      .navigationBarTitle("Authors")
+      .toolbar {
+         ToolbarItem(placement: .navigationBarTrailing) {
+            NavigationLink(destination: InsertAuthorView(), label: {
+               Image(systemName: "plus")
+            })
+         }
+      }
+   }
+}
+struct AuthorsView_Previews: PreviewProvider {
+   static var previews: some View {
+      AuthorsView(selected: .constant([]))
+   }
+}

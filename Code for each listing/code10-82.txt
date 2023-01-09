@@ -1,0 +1,80 @@
+struct InsertBookView: View {
+   @Environment(\.managedObjectContext) var dbContext
+   @Environment(\.dismiss) var dismiss
+   @State private var selectedAuthors: [Authors] = []
+   @State private var inputTitle: String = ""
+   @State private var inputYear: String = ""
+   
+   var showAuthors: String {
+      var authors = "Undefined"
+      if !selectedAuthors.isEmpty {
+         let listNames = selectedAuthors.map({ $0.name ?? "Undefined" })
+         if !listNames.isEmpty {
+            authors = listNames.joined(separator: ", ")
+         }
+      }
+      return authors
+   }
+   var body: some View {
+      VStack(spacing: 12) {
+         HStack {
+            Text("Title:")
+            TextField("Insert Title", text: $inputTitle)
+               .textFieldStyle(.roundedBorder)
+         }
+         HStack {
+            Text("Year:")
+            TextField("Insert Year", text: $inputYear)
+               .textFieldStyle(.roundedBorder)
+         }
+         HStack(alignment: .top) {
+            Text("Authors:")
+            VStack(alignment: .leading, spacing: 8) {
+               Text(showAuthors)
+                  .foregroundColor(selectedAuthors.count > 0 ? Color.black : Color.gray)
+               NavigationLink(destination: AuthorsView(selected: $selectedAuthors), label: {
+                  Text("Select Authors")
+               })
+            }
+         }.frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+         Spacer()
+      }.padding()
+      .navigationBarTitle("Add Book")
+      .toolbar {
+         ToolbarItem(placement: .navigationBarTrailing) {
+            Button("Save") {
+               let newTitle = inputTitle.trimmingCharacters(in: .whitespaces)
+               let newYear = Int32(inputYear)
+               if !newTitle.isEmpty && newYear != nil {
+                  Task(priority: .high) {
+                     await storeBook(title: newTitle, year: newYear!)
+                  }
+               }
+            }
+         }
+      }
+   }
+   func storeBook(title: String, year: Int32) async {
+      await dbContext.perform {
+         let newBook = Books(context: dbContext)
+         newBook.title = title
+         newBook.year = year
+         newBook.author = NSSet(array: selectedAuthors)
+         newBook.cover = UIImage(named: "bookcover")?.pngData()
+         newBook.thumbnail = UIImage(named: "bookthumbnail")?.pngData()
+
+         var letter = String(title.first!).uppercased()
+         if Int(letter) != nil {
+            letter = "#"
+         }
+         newBook.firstLetter = letter
+
+         do {
+            try dbContext.save()
+            dismiss()
+         } catch {
+            print("Error saving record")
+         }
+      }
+   }
+}

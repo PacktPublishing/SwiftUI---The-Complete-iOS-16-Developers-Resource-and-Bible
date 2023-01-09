@@ -1,0 +1,9 @@
+.onAppear {
+   let request: NSFetchRequest<Books> = Books.fetchRequest()
+   request.predicate = NSPredicate(format: "ANY author.name == %@", "Stephen King")
+   if let list = try? dbContext.fetch(request) {
+      for book in list {
+         print(book.title!)
+      }
+   }
+}

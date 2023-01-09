@@ -1,0 +1,21 @@
+struct ContentView: View {
+   @FetchRequest(sortDescriptors: [], predicate: NSPredicate(format: "year = 1983")) var listOfBooks: FetchedResults<Books>
+
+   var body: some View {
+      NavigationStack {
+         List {
+             ForEach(listOfBooks) { book in
+               RowBook(book: book)
+            }
+         }
+         .navigationBarTitle("Books")
+         .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+               NavigationLink(destination: InsertBookView(), label: {
+                  Image(systemName: "plus")
+               })
+            }
+         }
+      }
+   }
+}

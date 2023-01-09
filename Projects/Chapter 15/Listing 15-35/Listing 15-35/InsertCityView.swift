@@ -1,0 +1,44 @@
+
+import SwiftUI
+import CloudKit
+
+struct InsertCityView: View {
+   @EnvironmentObject var appData: ApplicationData
+   @Environment(\.dismiss) var dismiss
+
+   @State private var inputName: String = ""
+   @State private var buttonDisabled: Bool = false
+   let country: CKRecord.ID
+
+   var body: some View {
+      VStack {
+         HStack {
+            Text("City:")
+            TextField("Insert City", text: $inputName)
+               .textFieldStyle(.roundedBorder)
+         }
+         HStack {
+            Spacer()
+            Button("Save") {
+               let text = inputName.trimmingCharacters(in: .whitespaces)
+               if !text.isEmpty {
+                  buttonDisabled = true
+
+                  Task(priority: .high) {
+                     await appData.insertCity(name: text, country: self.country)
+                     dismiss()
+                  }
+               }
+            }.disabled(buttonDisabled)
+         }
+         Spacer()
+      }.padding()
+   }
+}
+struct InsertCityView_Previews: PreviewProvider {
+   static var previews: some View {
+      InsertCityView(country: CKRecord.ID(recordName: "Test"))
+         .environmentObject(ApplicationData.shared)
+   }
+}
+

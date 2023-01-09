@@ -1,0 +1,9 @@
+List {
+   ForEach(appData.listOfFiles[appData.currentDirectory] ?? []) { file in
+      NavigationLink(destination: {
+         FileDetailsView(file: file.id)
+      } , label: {
+         RowFile(file: file)
+      })
+   }
+}.listStyle(.plain)

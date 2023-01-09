@@ -1,0 +1,36 @@
+
+import SwiftUI
+import MapKit
+
+struct ContentView: View {
+   @EnvironmentObject var appData: ApplicationData
+
+   var body: some View {
+      Map(coordinateRegion: $appData.region, annotationItems: appData.annotations, annotationContent: { place in
+         MapAnnotation(coordinate: place.location) {
+            VStack(spacing: 0) {
+               Image("iconmap")
+                  .resizable()
+                  .frame(width: place.selected ? 60 : 40, height: place.selected ? 60 : 40)
+               Text(place.name)
+                  .font(.caption)
+            }
+            .onTapGesture {
+               for (index, item) in appData.annotations.enumerated() {
+                  if item.id == place.id {
+                     appData.annotations[index].selected.toggle()
+                  } else {
+                     appData.annotations[index].selected = false
+                  }
+               }
+            }
+         }
+      }).ignoresSafeArea()
+   }
+}
+struct ContentView_Previews: PreviewProvider {
+   static var previews: some View {
+      ContentView().environmentObject(ApplicationData())
+   }
+}
+

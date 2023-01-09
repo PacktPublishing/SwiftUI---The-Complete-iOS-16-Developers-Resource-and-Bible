@@ -1,0 +1,21 @@
+struct ContentView: View {
+   @EnvironmentObject var appData: ApplicationData
+
+   var body: some View {
+      ScrollViewReader { proxy in
+         ScrollView(.horizontal, showsIndicators: false) {
+            LazyHStack(spacing: 0) {
+               ForEach(appData.userData) { book in
+                  CellView(book: book)
+                     .id(book.id)
+               }
+               Button("< Go Back") {
+                  if let firstIdentifier = appData.userData.first?.id {
+                     proxy.scrollTo(firstIdentifier, anchor: .top)
+                  }
+               }.padding()
+            }
+         }
+      }
+   }
+}

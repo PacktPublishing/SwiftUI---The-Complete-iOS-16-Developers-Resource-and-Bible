@@ -1,0 +1,66 @@
+import SwiftUI
+
+struct File: Identifiable {
+   let id: UUID = UUID()
+   var name: String
+}
+struct FileContent {
+   var name: String
+   var content: String
+}
+class ApplicationData: ObservableObject {
+   @Published var listOfFiles: [File] = []
+   @Published var selectedFile: FileContent
+   @Published var openExporter: Bool = false
+
+   var manager: FileManager
+   var docURL: URL
+   var document: TextDocument
+
+   init() {
+      manager = FileManager.default
+      let documents = manager.urls(for: .documentDirectory, in: .userDomainMask)
+      docURL = documents.first!
+      document = TextDocument()
+      selectedFile = FileContent(name: "", content: "")
+
+      if let list = try? manager.contentsOfDirectory(atPath: docURL.path) {
+         for name in list {
+            let newFile = File(name: name)
+            listOfFiles.append(newFile)
+         }
+      }
+   }
+   func saveFile(name: String) {
+      let newFileURL = docURL.appendingPathComponent(name)
+      let path = newFileURL.path
+      manager.createFile(atPath: path, contents: nil, attributes: nil)
+      if !listOfFiles.contains(where: { $0.name == name}) {
+         listOfFiles.append(File(name: name))
+      }
+   }
+   func saveContent() {
+      if let data = selectedFile.content.data(using: .utf8, allowLossyConversion: true) {
+         let path = docURL.appendingPathComponent(selectedFile.name).path
+         manager.createFile(atPath: path, contents: data, attributes: nil)
+      }
+   }
+   func exportDocument(file: File) {
+      let content = getDocumentContent(file: file)
+      selectedFile = FileContent(name: file.name, content: content)
+      document.documentText = content
+      openExporter = true
+   }
+   func getDocumentContent(file: File) -> String {
+      selectedFile.name = file.name
+      let path = docURL.appendingPathComponent(file.name).path
+      if manager.fileExists(atPath: path) {
+         if let data = manager.contents(atPath: path) {
+            if let content = String(data: data, encoding: .utf8) {
+               return content
+            }
+         }
+      }
+      return ""
+   }
+}

@@ -1,0 +1,31 @@
+struct ContentView: View {
+   @State private var selected: Bool = true
+
+   var body: some View {
+      let SelectedLayout = selected ? AnyLayout(MyLayout()) : AnyLayout(VStackLayout(alignment: .leading))
+
+      VStack(alignment: .leading) {
+         Toggle(isOn: $selected, label: {
+            Text(selected ? "Custom" : "Standard")
+         }).padding(.bottom)
+         SelectedLayout {
+            Group {
+               Text("First")
+                  .padding(10)
+                  .background(.red)
+                  .cornerRadius(10)
+               Text("Second")
+                  .padding(10)
+                  .background(.red)
+                  .cornerRadius(10)
+               Text("Third")
+                  .padding(10)
+                  .background(.red)
+                  .cornerRadius(10)
+            }
+         }
+         Spacer()
+      }.padding()
+      .font(.title)
+   }
+}

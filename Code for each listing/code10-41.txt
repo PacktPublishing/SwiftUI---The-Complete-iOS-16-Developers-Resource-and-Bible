@@ -1,0 +1,6 @@
+{
+   "author": "Stephen King",
+   "title": "The Shining",
+   "year": 1977,
+   "cover": "bookcover.dat"
+}

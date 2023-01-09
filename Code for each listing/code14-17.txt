@@ -1,0 +1,11 @@
+.task(priority: .background) {
+   do {
+      let center = UNUserNotificationCenter.current()
+      let authorized = try await center.requestAuthorization(options: [.alert, .sound, .provisional])
+      await MainActor.run {
+         isButtonDisabled = !authorized
+      }
+   } catch {
+      print("Error: \(error)")
+   }
+}

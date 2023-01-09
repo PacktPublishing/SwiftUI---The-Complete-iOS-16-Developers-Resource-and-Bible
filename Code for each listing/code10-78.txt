@@ -1,0 +1,20 @@
+func saveBook(title: String, year: Int32) async {
+   await dbContext.perform {
+      book?.title = title
+      book?.year = year
+      book?.author = selectedAuthor
+
+      var letter = String(title.first!).uppercased()
+      if Int(letter) != nil {
+         letter = "#"
+      }
+      book?.firstLetter = letter
+
+      do {
+         try dbContext.save()
+         dismiss()
+      } catch {
+         print("Error saving record")
+      }
+   }
+}

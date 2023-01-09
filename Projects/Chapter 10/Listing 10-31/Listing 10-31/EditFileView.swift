@@ -1,0 +1,34 @@
+
+import SwiftUI
+
+struct EditFileView: View {
+   @EnvironmentObject var appData: ApplicationData
+   @Environment(\.dismiss) var dismiss
+   let file: File
+
+   var body: some View {
+      GroupBox(file.name) {
+         TextEditor(text: $appData.selectedFile.content)
+            .cornerRadius(10)
+      }.navigationTitle("Editor")
+      .toolbar {
+         ToolbarItem(placement: .navigationBarTrailing) {
+            Button("Save") {
+               appData.saveContent()
+               dismiss()
+            }
+         }
+      }
+      .onAppear {
+         let content = appData.getDocumentContent(file: file)
+         appData.selectedFile.content = content
+      }
+   }
+}
+struct EditFileView_Previews: PreviewProvider {
+   static var previews: some View {
+      EditFileView(file: File(name: ""))
+         .environmentObject(ApplicationData())
+   }
+}
+

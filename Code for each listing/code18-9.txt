@@ -1,0 +1,39 @@
+import SwiftUI
+import AVFoundation
+
+class ViewData {
+   var captureSession: AVCaptureSession!
+   var stillImage: AVCapturePhotoOutput!
+   var previewLayer: AVCaptureVideoPreviewLayer!
+   var imageOrientation: UIImage.Orientation!
+}
+class ApplicationData: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
+   @Published var path = NavigationPath()
+   @Published var picture: UIImage?
+
+   var cameraView: CustomPreviewLayer!
+   var viewData: ViewData
+
+   override init() {
+      cameraView = CustomPreviewLayer()
+      viewData = ViewData()
+      super.init()
+
+      Task(priority: .background) {
+         await receiveNotification()
+      }
+   }
+   func receiveNotification() async {
+      let center = NotificationCenter.default
+      let name = await UIDevice.orientationDidChangeNotification
+      for await _ in center.notifications(named: name, object: nil) {
+         if viewData.captureSession != nil {
+            await MainActor.run {
+               viewData.previewLayer.frame = cameraView.view.bounds
+               let videoOrientation = getCurrentOrientation()
+               let connection = viewData.previewLayer.connection
+               connection?.videoOrientation = videoOrientation
+            }
+         }
+      }
+   }

@@ -1,0 +1,15 @@
+struct ContentView: View {
+   @ObservedObject var contentData = ContentViewData()
+
+   var body: some View {
+     List {
+        ForEach(contentData.items) { section in
+             Section(header: Text(section.name)) {
+                 OutlineGroup(section.options ?? [], children: \.options) { item in
+                    Text(item.name)
+                 }
+             }
+         }
+     }.listStyle(.sidebar)
+   }
+}

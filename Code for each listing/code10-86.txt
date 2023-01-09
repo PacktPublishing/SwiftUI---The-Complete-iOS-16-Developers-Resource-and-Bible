@@ -1,0 +1,18 @@
+.onAppear {
+   let request: NSFetchRequest<Authors> = Authors.fetchRequest()
+   request.predicate = NSPredicate(format: "name == %@", "Stephen King")
+   if let list = try? dbContext.fetch(request), list.count > 0 {
+      let author = list[0]
+
+      Task(priority: .high) {
+         await dbContext.perform {
+            for book in listOfBooks {
+               let authorSet = book.mutableSetValue(forKey: "author")
+               authorSet.remove(author)
+               book.author = authorSet
+            }
+            try? dbContext.save()
+         }
+      }
+   }
+}

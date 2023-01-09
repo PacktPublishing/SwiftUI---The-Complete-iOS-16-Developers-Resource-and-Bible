@@ -1,0 +1,26 @@
+
+import SwiftUI
+
+struct ContentView: View {
+   @State private var selectedValue: Int = 0
+   let listCities: [String] = ["Paris", "Toronto", "Dublin"]
+
+   var body: some View {
+      VStack {
+         Text(listCities[selectedValue])
+         Picker("Cities:", selection: $selectedValue) {
+            ForEach(listCities.indices, id: \.self) { value in
+               Text(listCities[value])
+                  .tag(value)
+            }
+         }
+         Spacer()
+      }.padding()
+   }
+}
+struct ContentView_Previews: PreviewProvider {
+   static var previews: some View {
+      ContentView()
+   }
+}
+

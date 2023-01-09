@@ -1,0 +1,31 @@
+
+import SwiftUI
+
+struct BooksView: View {
+   @EnvironmentObject var appData: ApplicationData
+   @Binding var selectedBook: BookViewModel?
+   let selectedAuthor: String?
+
+   var listBooks: [BookViewModel] {
+      let list = appData.userData.filter({ item in
+         return item.author == selectedAuthor
+      })
+      return list.sorted(by: { $0.title < $1.title })
+   }
+   var body: some View {
+      List(listBooks, selection: $selectedBook) { book in
+         NavigationLink(value: book, label: {
+            Text(book.title)
+         })
+      }.listStyle(.grouped)
+      .navigationBarTitleDisplayMode(.inline)
+      .navigationTitle(selectedAuthor ?? "Undefined")
+   }
+}
+struct BooksView_Previews: PreviewProvider {
+   static var previews: some View {
+      BooksView(selectedBook: .constant(nil), selectedAuthor: nil)
+         .environmentObject(ApplicationData())
+   }
+}
+

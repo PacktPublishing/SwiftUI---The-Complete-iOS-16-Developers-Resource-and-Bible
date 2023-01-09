@@ -1,0 +1,58 @@
+
+import SwiftUI
+
+struct ContentView: View {
+   @EnvironmentObject var appData: ApplicationData
+   @State private var openSheet: Bool = false
+
+   var body: some View {
+      NavigationStack {
+         List {
+            ForEach(appData.userData) { book in
+               RowBook(book: book)
+            }
+         }
+         .navigationBarTitle("Books")
+         .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+               Button(action: {
+                  openSheet = true
+               }, label: {
+                  Image(systemName: "plus")
+               })
+            }
+         }
+         .sheet(isPresented: $openSheet) {
+            InsertBookView()
+         }
+      }
+   }
+}
+struct RowBook: View {
+   let book: BookViewModel
+
+   var body: some View {
+      HStack(alignment: .top) {
+         Image(uiImage: book.cover)
+            .resizable()
+            .scaledToFit()
+            .frame(width: 80, height: 100)
+            .cornerRadius(10)
+         VStack(alignment: .leading, spacing: 2) {
+            Text(book.title)
+               .bold()
+            Text(book.author)
+            Text(book.year)
+               .font(.caption)
+            Spacer()
+         }.padding(.top, 5)
+         Spacer()
+      }.padding(.top, 10)
+   }
+}
+struct ContentView_Previews: PreviewProvider {
+   static var previews: some View {
+      ContentView().environmentObject(ApplicationData())
+   }
+}
+

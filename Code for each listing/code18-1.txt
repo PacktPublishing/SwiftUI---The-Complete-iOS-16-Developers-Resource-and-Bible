@@ -1,0 +1,30 @@
+import SwiftUI
+import PhotosUI
+
+struct ContentView: View {
+   @State private var selected: PhotosPickerItem?
+   @State private var picture: UIImage?
+
+   var body: some View {
+      NavigationStack {
+         VStack {
+            Image(uiImage: picture ?? UIImage(named: "nopicture")!)
+               .resizable()
+               .scaledToFit()
+            Spacer()
+         }
+         .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+               PhotosPicker(selection: $selected, matching: .images, photoLibrary: .shared()) { Text("Select a photo") }
+            }
+         }
+         .onChange(of: selected) { item in
+            Task(priority: .background) {
+               if let data = try? await item?.loadTransferable(type: Data.self) {
+                  picture = UIImage(data: data)
+               }
+            }
+         }
+      }
+   }
+}

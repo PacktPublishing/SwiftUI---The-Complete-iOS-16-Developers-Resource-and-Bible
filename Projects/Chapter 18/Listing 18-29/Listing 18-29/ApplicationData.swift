@@ -1,0 +1,65 @@
+
+import SwiftUI
+import AVFoundation
+
+class ViewData: NSObject {
+   var playerItem1: AVPlayerItem!
+   var playerItem2: AVPlayerItem!
+   var player: AVQueuePlayer!
+   var playerLayer: AVPlayerLayer!
+
+   func setObserver() {
+      playerItem1.addObserver(self, forKeyPath: "status", options: [], context: nil)
+   }
+   override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+      if playerItem1.status == .readyToPlay {
+         playerItem1.removeObserver(self, forKeyPath: "status")
+         player.play()
+      }
+   }
+}
+class ApplicationData: ObservableObject {
+   @Published var playing: Bool = false
+   @Published var progress: CGFloat = 0
+   var customVideoView: CustomPlayerView!
+   var viewData: ViewData
+   
+   init() {
+      customVideoView = CustomPlayerView()
+      viewData = ViewData()
+      
+      let bundle = Bundle.main
+      let videoURL1 = bundle.url(forResource: "videotrees", withExtension: "mp4")
+      let videoURL2 = bundle.url(forResource: "videobeaches", withExtension: "mp4")
+
+      let asset1 = AVURLAsset(url: videoURL1!)
+      let asset2 = AVURLAsset(url: videoURL2!)
+      viewData.playerItem1 = AVPlayerItem(asset: asset1)
+      viewData.playerItem2 = AVPlayerItem(asset: asset2)
+      viewData.player = AVQueuePlayer(items: [viewData.playerItem1, viewData.playerItem2])
+      viewData.playerLayer = AVPlayerLayer(player: viewData.player)
+
+      let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+      let screenSize = scene?.screen.bounds ?? .zero
+      viewData.playerLayer.frame = screenSize
+      let layer = customVideoView.view.layer
+      layer.addSublayer(viewData.playerLayer)
+      viewData.setObserver()
+
+      Task(priority: .background) {
+         await receiveNotification()
+      }
+   }
+   func receiveNotification() async {
+      let center = NotificationCenter.default
+      let name = await UIDevice.orientationDidChangeNotification
+      for await _ in center.notifications(named: name, object: nil) {
+         if viewData.player != nil {
+            await MainActor.run {
+               viewData.playerLayer.frame = customVideoView.view.bounds
+            }
+         }
+      }
+   }
+}
+

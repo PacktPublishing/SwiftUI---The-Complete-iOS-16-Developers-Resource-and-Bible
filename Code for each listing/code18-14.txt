@@ -1,0 +1,4 @@
+func takePicture() {
+   let settings = AVCapturePhotoSettings()
+   viewData.stillImage.capturePhoto(with: settings, delegate: self)
+}

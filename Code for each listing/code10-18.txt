@@ -1,0 +1,29 @@
+class ApplicationData: ObservableObject {
+   @Published var imageInFile: UIImage?
+   var manager: FileManager
+   var docURL: URL
+   let listPictures = ["spot1", "spot2", "spot3"]
+
+   init() {
+      manager = FileManager.default
+      docURL = manager.urls(for: .documentDirectory, in: .userDomainMask).first!
+
+      let fileURL = docURL.appendingPathComponent("imagedata.dat")
+      let filePath = fileURL.path
+      if manager.fileExists(atPath: filePath) {
+         if let content = manager.contents(atPath: filePath) {
+            imageInFile = UIImage(data: content)
+         }
+      }
+   }
+   func saveFile(namePicture: String) {
+      let image = UIImage(named: namePicture)
+      if let imageData = image?.pngData() {
+         let fileURL = docURL.appendingPathComponent("imagedata.dat")
+         let filePath = fileURL.path
+         if manager.createFile(atPath: filePath, contents: imageData, attributes: nil) {
+            imageInFile = image
+         }
+      }
+   }
+}

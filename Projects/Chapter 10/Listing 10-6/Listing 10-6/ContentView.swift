@@ -1,0 +1,33 @@
+
+import SwiftUI
+
+struct ContentView: View {
+   @EnvironmentObject var appData: ApplicationData
+   @State private var openSheet: Bool = false
+
+   var body: some View {
+      NavigationStack {
+         VStack {
+            Text("No Files")
+            Spacer()
+         }.padding()
+         .navigationBarTitle("Files")
+         .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+               Button("Add File") {
+                  openSheet = true
+               }
+            }
+         }
+         .sheet(isPresented: $openSheet) {
+            AddFileView()
+         }
+      }
+   }
+}
+struct ContentView_Previews: PreviewProvider {
+   static var previews: some View {
+      ContentView().environmentObject(ApplicationData())
+   }
+}
+

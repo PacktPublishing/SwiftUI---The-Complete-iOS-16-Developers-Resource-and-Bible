@@ -1,0 +1,43 @@
+
+import SwiftUI
+
+struct ContentView: View {
+   @EnvironmentObject var appData: ApplicationData
+   @State private var openSheet: Bool = false
+
+   var body: some View {
+      NavigationStack {
+         VStack {
+            Picker("", selection: $appData.currentDirectory) {
+               ForEach(0..<appData.directories.count, id: \.self) { index in
+                  Text(appData.directories[index])
+                     .tag(index)
+               }
+            }.padding([.leading, .trailing], 8)
+            .pickerStyle(.segmented)
+            List {
+               ForEach(appData.listOfFiles[appData.currentDirectory] ?? []) { file in
+                  Text(file.name)
+               }
+            }.listStyle(.plain)
+         }
+         .navigationBarTitle("Files")
+         .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+               Button("Add File") {
+                  openSheet = true
+               }.disabled(appData.currentDirectory != 0 ? true : false)
+            }
+         }
+         .sheet(isPresented: $openSheet) {
+            AddFileView()
+         }
+      }
+   }
+}
+struct ContentView_Previews: PreviewProvider {
+   static var previews: some View {
+      ContentView().environmentObject(ApplicationData())
+   }
+}
+

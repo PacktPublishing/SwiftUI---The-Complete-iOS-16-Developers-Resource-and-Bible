@@ -1,0 +1,15 @@
+func prepareCamera() {
+   viewData.captureSession = AVCaptureSession()
+   if let device = AVCaptureDevice.default(for: AVMediaType.video) {
+      if let input = try? AVCaptureDeviceInput(device: device) {
+         viewData.captureSession.addInput(input)
+         viewData.stillImage = AVCapturePhotoOutput()
+         viewData.captureSession.addOutput(viewData.stillImage)
+         showCamera()
+      } else {
+         print("Not Authorized")
+      }
+   } else {
+      print("Not Authorized")
+   }
+}

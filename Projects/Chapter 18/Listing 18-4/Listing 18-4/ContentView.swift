@@ -1,0 +1,39 @@
+
+import SwiftUI
+
+class ContentData: ObservableObject {
+   @Published var path = NavigationPath()
+   @Published var picture: UIImage?
+}
+struct ContentView: View {
+   @ObservedObject var contentData = ContentData()
+   var ImagePickerView: ImagePicker!
+
+   init() {
+      ImagePickerView = ImagePicker(path: $contentData.path, picture: $contentData.picture)
+   }
+   var body: some View {
+      NavigationStack(path: $contentData.path) {
+         VStack {
+            HStack {
+               Spacer()
+               NavigationLink("Get Picture", value: "Open Picker")
+            }.navigationDestination(for: String.self, destination: { _ in
+               ImagePickerView
+            })
+            Image(uiImage: contentData.picture ?? UIImage(named: "nopicture")!)
+               .resizable()
+               .scaledToFill()
+               .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+               .clipped()
+            Spacer()
+         }.padding()
+      }.statusBarHidden()
+   }
+}
+struct ContentView_Previews: PreviewProvider {
+   static var previews: some View {
+      ContentView()
+   }
+}
+

@@ -1,0 +1,16 @@
+struct CityViewModel: Identifiable {
+   let id: CKRecord.ID
+   let city: City
+
+   var cityName: String {
+      return city.name ?? "Undefined"
+   }
+   var cityPicture: UIImage {
+      if let asset = city.record["picture"] as? CKAsset, let fileURL = asset.fileURL {
+         if let picture = UIImage(contentsOfFile: fileURL.path) {
+            return picture
+         }
+      }
+      return UIImage(named: "nopicture")!
+   }
+}

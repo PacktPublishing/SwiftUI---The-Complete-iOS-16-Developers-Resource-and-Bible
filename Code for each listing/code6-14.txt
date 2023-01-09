@@ -1,0 +1,12 @@
+import SwiftUI
+
+@main
+struct TestApp: App {
+   @StateObject private var appData = ApplicationData()
+
+   var body: some Scene {
+      WindowGroup {
+         ContentView(appData: appData)
+      }
+   }
+}

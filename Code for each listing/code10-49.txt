@@ -1,0 +1,54 @@
+import SwiftUI
+import CoreData
+
+struct ContentView: View {
+   @FetchRequest(sortDescriptors: [], predicate: nil, animation: .default) private var listOfBooks: FetchedResults<Books>
+
+   var body: some View {
+      NavigationStack {
+         List {
+             ForEach(listOfBooks) { book in
+               RowBook(book: book)
+            }
+         }
+         .navigationBarTitle("Books")
+         .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+               NavigationLink(destination: InsertBookView(), label: {
+                  Image(systemName: "plus")
+               })
+            }
+         }
+      }
+   }
+}
+struct RowBook: View {
+   let book: Books
+
+   var imageCover: UIImage {
+      if let data = book.thumbnail, let image = UIImage(data: data) {
+         return image
+      } else {
+         return UIImage(named: "nopicture")!
+      }
+   }
+   var body: some View {
+      HStack(alignment: .top) {
+         Image(uiImage: imageCover)
+            .resizable()
+            .scaledToFit()
+            .frame(width: 80, height: 100)
+            .cornerRadius(10)
+         VStack(alignment: .leading, spacing: 2) {
+            Text(book.title ?? "Undefined")
+               .bold()
+            Text(book.author?.name ?? "Undefined")
+               .foregroundColor(book.author != nil ? .black : .gray)
+            Text(String(book.year))
+               .font(.caption)
+            Spacer()
+         }.padding(.top, 5)
+         Spacer()
+      }.padding(.top, 5)
+   }
+}

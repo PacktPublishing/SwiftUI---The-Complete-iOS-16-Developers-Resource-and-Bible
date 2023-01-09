@@ -1,0 +1,38 @@
+
+import SwiftUI
+
+struct ContentView: View {
+   @EnvironmentObject var appData: ApplicationData
+   @State private var currentPicture: UIImage = UIImage(named: "nopicture")!
+
+   var body: some View {
+      VStack {
+         HStack(spacing: 10) {
+            ForEach(appData.listPictures) { picture in
+               Image(uiImage: UIImage(data: picture.image) ?? UIImage(named: "nopicture")!)
+                  .resizable()
+                  .frame(width: 80, height: 100)
+                  .draggable(picture)
+            }
+         }.frame(height: 120)
+         Image(uiImage: currentPicture)
+            .resizable()
+            .scaledToFit()
+            .padding(10)
+            .dropDestination(for: PictureRepresentation.self, action: { elements, location in
+               if let picture = elements.first {
+                  currentPicture = UIImage(data: picture.image) ?? UIImage(named: "nopicture")!
+                  appData.listPictures.removeAll(where: { $0.id == picture.id })
+                  return true
+               }
+               return false
+            })
+      }
+   }
+}
+struct ContentView_Previews: PreviewProvider {
+   static var previews: some View {
+      ContentView().environmentObject(ApplicationData())
+   }
+}
+

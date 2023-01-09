@@ -1,0 +1,42 @@
+struct FileDetailsView: View {
+   @EnvironmentObject var appData: ApplicationData
+   let file: UUID
+
+   var body: some View {
+      let values = appData.getDetails(file: file)
+      return VStack {
+         HStack {
+            Text("Name:")
+               .frame(width: 80, alignment: .trailing)
+            Text(values.0)
+               .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+         }
+         HStack {
+            Text("Extension:")
+               .frame(width: 80, alignment: .trailing)
+            Text(values.1)
+               .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+         }
+         HStack {
+            Text("Size:")
+               .frame(width: 80, alignment: .trailing)
+            Text(values.2)
+               .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+         }
+         HStack {
+            Text("Date:")
+               .frame(width: 80, alignment: .trailing)
+            Text(values.3)
+               .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+         }
+         Spacer()
+      }.padding()
+      .navigationBarTitle("Details")
+   }
+}
+struct FileDetailsView_Previews: PreviewProvider {
+   static var previews: some View {
+      FileDetailsView(file: UUID())
+         .environmentObject(ApplicationData())
+   }
+}

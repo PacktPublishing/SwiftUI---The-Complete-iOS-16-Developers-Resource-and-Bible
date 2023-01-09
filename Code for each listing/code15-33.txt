@@ -1,0 +1,7 @@
+List {
+   ForEach(appData.listCities) { city in
+      NavigationLink(destination: ShowPictureView(selectedCity: city)) {
+         Text(city.cityName)
+      }
+   }
+}

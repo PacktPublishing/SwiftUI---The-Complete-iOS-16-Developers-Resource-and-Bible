@@ -1,0 +1,15 @@
+func saveFile(namePicture: String) {
+   guard let image = UIImage(named: namePicture) else {
+      return
+   }
+   guard let thumbnail = image.preparingThumbnail(of: CGSize(width: 100, height: 100)) else {
+      return
+   }
+   if let imageData = thumbnail.pngData() {
+      let fileURL = docURL.appendingPathComponent("imagedata.dat")
+      let filePath = fileURL.path
+      if manager.createFile(atPath: filePath, contents: imageData, attributes: nil) {
+         imageInFile = thumbnail
+      }
+   }
+}

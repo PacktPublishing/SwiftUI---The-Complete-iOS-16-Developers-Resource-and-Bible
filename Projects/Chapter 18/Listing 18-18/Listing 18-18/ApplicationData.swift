@@ -1,0 +1,15 @@
+
+import SwiftUI
+import AVKit
+
+class ApplicationData: ObservableObject {
+   @Published var player: AVPlayer!
+   
+   init() {
+      let bundle = Bundle.main
+      if let videoURL = bundle.url(forResource: "videotrees", withExtension: "mp4") {
+         player = AVPlayer(url: videoURL)
+      }
+   }
+}
+

@@ -1,0 +1,14 @@
+func checkZones() async {
+   let newZone = CKRecordZone(zoneName: "myNewZone")
+   do {
+      try await database.recordZone(for: newZone.zoneID)
+   } catch {
+      if let error = error as? CKError {
+         if error.code == CKError.Code.zoneNotFound {
+            print("Not found")
+         } else {
+            print("Zone Found")
+         }
+      }
+   }
+}

@@ -1,0 +1,6 @@
+func countBooks() {
+   let request: NSFetchRequest<Books> = Books.fetchRequest()
+   if let count = try? self.dbContext.count(for: request) {
+      totalBooks = count
+   }
+}

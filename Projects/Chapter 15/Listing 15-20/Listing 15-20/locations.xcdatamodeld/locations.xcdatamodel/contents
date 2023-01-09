@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21277" systemVersion="21F79" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
+    <entity name="Cities" representedClassName="Cities" syncable="YES" codeGenerationType="class">
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="country" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Countries" inverseName="cities" inverseEntity="Countries"/>
+    </entity>
+    <entity name="Countries" representedClassName="Countries" syncable="YES" codeGenerationType="class">
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="cities" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Cities" inverseName="country" inverseEntity="Cities"/>
+    </entity>
+</model>

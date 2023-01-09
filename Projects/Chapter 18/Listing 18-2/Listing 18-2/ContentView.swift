@@ -1,0 +1,46 @@
+
+import SwiftUI
+import PhotosUI
+
+struct ContentView: View {
+   @EnvironmentObject var appData: ApplicationData
+
+   let guides = [
+      GridItem(.flexible()),
+      GridItem(.flexible()),
+      GridItem(.flexible())
+   ]
+   var body: some View {
+      NavigationStack {
+         ScrollView {
+            LazyVGrid(columns: guides) {
+               ForEach(appData.listPictures) { item in
+                  Image(uiImage: item.image)
+                     .resizable()
+                     .scaledToFit()
+               }
+            }
+         }.padding()
+         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+               Button("Deselect") {
+                  appData.selected = []
+               }
+            }
+            ToolbarItem(placement: .navigationBarTrailing) {
+               PhotosPicker(selection: $appData.selected, maxSelectionCount: 4, selectionBehavior: .ordered, matching: .images, photoLibrary: .shared()) { Text("Select Photos") }
+            }
+         }
+         .onChange(of: appData.selected) { items in
+            appData.removeDeselectedItems()
+            appData.addSelectedItems()
+         }
+      }
+   }
+}
+struct ContentView_Previews: PreviewProvider {
+   static var previews: some View {
+      ContentView().environmentObject(ApplicationData())
+   }
+}
+

@@ -1,0 +1,54 @@
+func insertCountry(name: String) async {
+   await configureDatabase()
+
+   let text = name.trimmingCharacters(in: .whitespaces)
+   if !text.isEmpty {
+      let zone = CKRecordZone(zoneName: "listPlaces")
+      let id = CKRecord.ID(recordName: "idcountry-\(UUID())", zoneID: zone.zoneID)
+      let record = CKRecord(recordType: "Countries", recordID: id)
+      record.setObject(text as NSString, forKey: "name")
+
+      do {
+         try await database.save(record)
+         await MainActor.run {
+            let newCountry = Country(name: record["name"], record: record)
+            let newItem = CountryViewModel(id: record.recordID, country: newCountry)
+            listCountries.append(newItem)
+            listCountries.sort(by: { $0.countryName < $1.countryName })
+         }
+      } catch {
+         print("Error: \(error)")
+      }
+   }
+}
+func insertCity(name: String, country: CKRecord.ID) async {
+   await configureDatabase()
+
+   let text = name.trimmingCharacters(in: .whitespaces)
+   if !text.isEmpty {
+      let zone = CKRecordZone(zoneName: "listPlaces")
+      let id = CKRecord.ID(recordName: "idcity-\(UUID())", zoneID: zone.zoneID)
+      let record = CKRecord(recordType: "Cities", recordID: id)
+      record.setObject(text as NSString, forKey: "name")
+
+      let reference = CKRecord.Reference(recordID: country, action: .deleteSelf)
+      record.setObject(reference, forKey: "country")
+
+      let bundle = Bundle.main
+      if let fileURL = bundle.url(forResource: "Toronto", withExtension: "jpg") {
+         let asset = CKAsset(fileURL: fileURL)
+         record.setObject(asset, forKey: "picture")
+      }
+      do {
+         try await database.save(record)
+         await MainActor.run {
+            let newCity = City(name: record["name"], record: record)
+            let newItem = CityViewModel(id: record.recordID, city: newCity)
+            listCities.append(newItem)
+            listCities.sort(by: { $0.cityName < $1.cityName })
+         }
+      } catch {
+         print("Error: \(error)")
+      }
+   }
+}

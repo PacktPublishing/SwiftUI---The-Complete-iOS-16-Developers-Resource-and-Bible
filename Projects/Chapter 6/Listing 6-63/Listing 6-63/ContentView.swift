@@ -1,0 +1,28 @@
+
+import SwiftUI
+
+struct ContentView: View {
+   @State private var size: CGSize = .zero
+
+   var body: some View {
+      VStack {
+         Image("spot1")
+            .resizable()
+            .scaledToFit()
+            .background(
+               GeometryReader { geometry in
+                  Color.clear
+                     .onAppear {
+                        size = geometry.size
+                     }
+               })
+         Text("\(Int(size.width)) x \(Int(size.height))")
+      }.padding(100)
+   }
+}
+struct ContentView_Previews: PreviewProvider {
+   static var previews: some View {
+      ContentView()
+   }
+}
+

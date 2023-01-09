@@ -1,0 +1,51 @@
+import SwiftUI
+
+struct Publisher: Codable {
+   let name: String
+   let date: Date
+}
+struct Book: Codable {
+   let title: String?
+   let author: String?
+   let publisher: Publisher?
+}
+struct BookViewModel {
+   var book: Book
+    
+   var title: String {
+      return book.title?.capitalized ?? "Undefined"
+   }
+   var author: String {
+      return book.author?.capitalized ?? "Undefined"
+   }
+   var publisher: String {
+      return book.publisher?.name.capitalized ?? "Undefined"
+   }
+   var date: String {
+      if let date = book.publisher?.date {
+         let format = date.formatted(date: .abbreviated, time: .omitted)
+         return format
+      } else {
+         return "Undefined"
+      }
+   }
+}
+class ApplicationData: ObservableObject {
+   @Published var bookInFile: BookViewModel
+    
+   init() {
+      bookInFile = BookViewModel(book: Book(title: nil, author: nil, publisher: nil))
+
+      let manager = FileManager.default
+      let bundle = Bundle.main
+      if let path = bundle.path(forResource: "template", ofType: "json") {
+         if let data = manager.contents(atPath: path) {
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .deferredToDate
+            if let book = try? decoder.decode(Book.self, from: data) {
+               bookInFile.book = book
+            }
+         }
+      }
+   }
+}

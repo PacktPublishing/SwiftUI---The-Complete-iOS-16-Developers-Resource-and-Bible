@@ -1,0 +1,9 @@
+
+let message = """
+John
+George
+Martin
+"""
+let separator = /\n/
+let result = message.replacing(separator, with: ", ")
+print(result)  // "John, George, Martin"

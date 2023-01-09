@@ -1,0 +1,34 @@
+struct ContentView: View {
+   @EnvironmentObject var appData: ApplicationData
+   @State private var searchTerm: String = ""
+
+   var body: some View {
+      NavigationStack {
+         SearchableView()
+            .navigationTitle(Text("Books"))
+      }
+      .searchable(text: $searchTerm, prompt: Text("Insert title"))
+      .onChange(of: searchTerm) { value in
+         let search = value.trimmingCharacters(in: .whitespaces)
+         appData.filterValues(search: search)
+      }
+   }
+}
+struct SearchableView: View {
+   @EnvironmentObject var appData: ApplicationData
+   @Environment(\.isSearching) var isSearching
+   @Environment(\.dismissSearch) var dismissSearch
+
+   var body: some View {
+      List {
+         if isSearching {
+            Button("Dismiss") {
+               dismissSearch()
+            }
+         }
+         ForEach(appData.filteredItems) { book in
+            CellBook(book: book)
+         }
+      }
+   }
+}

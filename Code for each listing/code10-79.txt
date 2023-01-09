@@ -1,0 +1,1 @@
+@SectionedFetchRequest(sectionIdentifier: \Books.firstLetter, sortDescriptors: [SortDescriptor(\Books.title, order: .forward)], predicate: nil, animation: .default) private var sectionBooks: SectionedFetchResults<String?, Books>

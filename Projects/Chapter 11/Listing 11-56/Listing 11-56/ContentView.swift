@@ -1,0 +1,21 @@
+
+import SwiftUI
+
+struct ContentView: View {
+   var body: some View {
+      TimelineView(.periodic(from: Date(), by: 2)) { time in
+         let calendar = Calendar.current
+         let components = calendar.dateComponents([.second], from: time.date)
+         HStack {
+            Text("Time: \(components.second ?? 0)")
+               .font(.largeTitle.bold())
+         }
+      }
+   }
+}
+struct ContentView_Previews: PreviewProvider {
+   static var previews: some View {
+      ContentView()
+   }
+}
+

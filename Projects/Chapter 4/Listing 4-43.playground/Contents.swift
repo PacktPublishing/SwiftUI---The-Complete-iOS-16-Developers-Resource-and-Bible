@@ -1,0 +1,8 @@
+
+let message = "Name: John"
+let regex = /Name:\s+[a-zA-Z]+/
+
+if let match = message.firstMatch(of: regex) {
+   let found = match.output
+   print("Found: \(found)")  // "Found: Name: John"
+}
